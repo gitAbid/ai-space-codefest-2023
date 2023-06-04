@@ -51,6 +51,7 @@ p span:first-child{
   text-align: right;
   margin-left: 30%;
   display: flex;
+  background-color: #4a0075;
   flex-direction: row-reverse;
 }
 
