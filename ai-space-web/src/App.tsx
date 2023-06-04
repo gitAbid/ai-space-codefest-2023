@@ -19,13 +19,13 @@ function App() {
 
         setMessage("");
 
-        fetch("http://localhost:8000/", {
+        fetch("http://localhost:8080/chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                chats,
+                chats
             }),
         })
             .then((response) => response.json())
@@ -42,17 +42,17 @@ function App() {
 
     return (
         <main>
-            <h1>FullStack Chat AI Tutorial</h1>
+            <h1>OnBoarding AI Space</h1>
 
             <section>
                 {chats && chats.length
                     ? chats.map((chat, index) => (
-                        <p key={index} className={chat.role === "user" ? "user_msg" : ""}>
+                        <p key={index} className={"user_msg"}>
                 <span>
-                  <b>{chat.role.toUpperCase()}</b>
+                  <b>{chat["role"].toUpperCase()}</b>
                 </span>
                             <span>:</span>
-                            <span>{chat.content}</span>
+                            <span>{chat["content"]}</span>
                         </p>
                     ))
                     : ""}
