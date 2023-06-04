@@ -16,22 +16,22 @@ class ChatHandler(@Autowired private val chatService: ChatService) {
 
         println("chatRequest ${chatRequest}")
 
-        val chatCompletion = chatService.getChatCompletion(
-            ChatRequest(
-                messages = listOf(
-                    Message(
-                        role = chatRequest.role,
-                        content = chatRequest.content
-                    )
-                )
-            )
-        )
-        return ServerResponse.ok().bodyValueAndAwait(chatCompletion.choices[0].message)
-//        return ServerResponse.ok().bodyValueAndAwait(
-//            Message(
-//                role = "assistant",
-//                content = "I'm sorry, I don't understand what you're trying to say. Can you please provide more context or information?"
+//        val chatCompletion = chatService.getChatCompletion(
+//            ChatRequest(
+//                messages = listOf(
+//                    Message(
+//                        role = chatRequest.role,
+//                        content = chatRequest.content
+//                    )
+//                )
 //            )
 //        )
+//        return ServerResponse.ok().bodyValueAndAwait(chatCompletion.choices[0].message)
+        return ServerResponse.ok().bodyValueAndAwait(
+            Message(
+                role = "assistant",
+                content = "I'm sorry, I don't understand what you're trying to say. Can you please provide more context or information?"
+            )
+        )
     }
 }
