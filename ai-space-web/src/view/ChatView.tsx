@@ -50,6 +50,7 @@ function ChatView(){
     return (
         <div>
                 <h2>AI Assistant</h2>
+                <br/>
             <div>
                 {chats && chats.length
                     ? chats.map((chat: ChatMessage, index: number) => (

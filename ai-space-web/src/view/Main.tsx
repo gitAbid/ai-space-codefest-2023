@@ -1,5 +1,6 @@
 import React from "react"
 import ChatView from "./ChatView";
+import TrackerView from "./TrackerView";
 
 function Main() {
     return (
@@ -14,7 +15,7 @@ function Main() {
                 </div>
 
                 <div className={"col-sm-6"}>
-                    <ChatView/>
+                    <TrackerView/>
                 </div>
             </div>
         </>
