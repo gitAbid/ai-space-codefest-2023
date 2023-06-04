@@ -11,19 +11,27 @@ import org.springframework.web.reactive.function.server.*
 @Component
 class ChatHandler(@Autowired private val chatService: ChatService) {
     suspend fun chat(request: ServerRequest): ServerResponse {
-        val chatRequest = request.awaitBodyOrNull<ChatData>()
+        val chatRequest = request.awaitBodyOrNull<Message>()
             ?: throw java.lang.RuntimeException("Bad Request")
+
+        println("chatRequest ${chatRequest}")
 
         val chatCompletion = chatService.getChatCompletion(
             ChatRequest(
                 messages = listOf(
                     Message(
-                        role = chatRequest.chats[0].role,
-                        content = chatRequest.chats[0].content
+                        role = chatRequest.role,
+                        content = chatRequest.content
                     )
                 )
             )
         )
         return ServerResponse.ok().bodyValueAndAwait(chatCompletion.choices[0].message)
+//        return ServerResponse.ok().bodyValueAndAwait(
+//            Message(
+//                role = "assistant",
+//                content = "I'm sorry, I don't understand what you're trying to say. Can you please provide more context or information?"
+//            )
+//        )
     }
 }

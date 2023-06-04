@@ -23,13 +23,18 @@ class ChatService(
         .build()
 
     suspend fun getChatCompletion(request: ChatRequest): ChatCompletion {
+
+        println("Request Body ${request}")
         val responseBody = webClient.post()
             .uri("/chat/completions")
             .bodyValue(request)
             .awaitExchange { clientResponse ->
             when{
                 clientResponse.statusCode().is2xxSuccessful ->{
-                    clientResponse.awaitBody<ChatCompletion>()
+                    val responseBody = clientResponse.awaitBody<ChatCompletion>()
+                    println("ResponseBody -[$responseBody]")
+                    responseBody
+
                 }
                 clientResponse.statusCode().is4xxClientError -> {
 
