@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 import {FormEvent} from "react/ts5.0";
 import {ChatMessage} from "../App";
-function ChatView(){
+
+function ChatView() {
 
     const [message, setMessage] = useState<string>("");
     const [chats, setChats] = useState<ChatMessage[]>([]);
@@ -11,15 +12,15 @@ function ChatView(){
 
     const chatUpdater = async (e: FormEvent<HTMLFormElement>, message: string): Promise<void> => {
         e.preventDefault();
-        console.log("E Value",e.target)
+        console.log("E Value", e.target)
         if (!message) return;
         setIsTyping(true);
         window.scrollTo(0, 1e10);
 
         let msgs: ChatMessage[] = [...chats];
-        msgs.push({ role: "user", content: message });
+        msgs.push({role: "user", content: message});
         setChats(msgs);
-        let request: ChatMessage = { role: "user", content: message }
+        let request: ChatMessage = {role: "user", content: message}
         console.log("MSG_LIst", msgs)
         console.log("Message", message)
 
@@ -49,8 +50,8 @@ function ChatView(){
 
     return (
         <div>
-                <h2>AI Assistant</h2>
-                <br/>
+            <h2>AI Assistant</h2>
+            <br/>
             <div>
                 {chats && chats.length
                     ? chats.map((chat: ChatMessage, index: number) => (

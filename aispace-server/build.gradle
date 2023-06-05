@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id 'org.springframework.boot' version '2.7.12'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-	id 'org.jetbrains.kotlin.jvm' version '1.6.21'
-	id 'org.jetbrains.kotlin.plugin.spring' version '1.6.21'
+	id 'org.jetbrains.kotlin.jvm' version '1.8.0'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.8.0'
 }
 
 group = 'com.hexamigos'
@@ -21,6 +21,14 @@ dependencies {
 	implementation 'io.projectreactor.kotlin:reactor-kotlin-extensions'
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
+
+	// import Kotlin API client BOM
+	implementation platform('com.aallam.openai:openai-client-bom:3.2.5')
+
+	// define dependencies without versions
+	implementation 'com.aallam.openai:openai-client'
+	runtimeOnly 'io.ktor:ktor-client-okhttp'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 }
