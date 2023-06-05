@@ -12,8 +12,9 @@ import java.util.*
 
 @SpringBootApplication
 class AispaceServerApplication
-		fun main(args: Array<String>) {
-			runApplication<AispaceServerApplication>(*args)
-		}
+
+fun main(args: Array<String>) {
+    runApplication<AispaceServerApplication>(*args)
+}
 
 
