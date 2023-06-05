@@ -60,7 +60,7 @@ function ChatView() {
                   <b>{chat.role.toUpperCase()}</b>
                 </span>
                             <span>:</span>
-                            <span><pre>{chat.content}</pre></span>
+                            <span>{chat.content}</span>
                         </p>
                     ))
                     : ""}

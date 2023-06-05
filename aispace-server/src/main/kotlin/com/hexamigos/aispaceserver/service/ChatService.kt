@@ -13,17 +13,12 @@ class ChatService(val openAiLLM: OpenAiLLM) {
 
     @OptIn(BetaOpenAI::class)
     suspend fun getChatCompletion(message: String): Chat {
-        println("Request Body ${message}")
-
-
-        message.contains("@task")
+        println("Request Body $message")
 
         val task = arrayListOf<String>("1. Task: Complete Release. Progress: Done",
                 "2. Task: Discuss with weleed vai. Progress: Done",
                 "3. Task: Progress meeting on code fest. Progress: Done ",
                 "5. Task: Work on code fest demo. Progress: Ongoing")
-
-
 
         val (_, responseMessage, _, _) = openAiLLM.getChatCompletion(OpenAIRequest(
                 requestMessage = message,
@@ -35,7 +30,7 @@ class ChatService(val openAiLLM: OpenAiLLM) {
                         2. Cube
                         3. Appigo
                         ${if (message.contains("@task")) "Task list: \n${task}" else ""}
-                    """.trimIndent()
+                    """.trimIndent().trim()
         )) as OpenAIChatResponse
         val content = responseMessage[0].message?.content;
         return Chat(role = "Assistant", content = content ?: "Sorry? I don't know what to say")

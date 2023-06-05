@@ -7,6 +7,8 @@ import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.completion.CompletionRequest
 import com.aallam.openai.api.completion.TextCompletion
+import com.aallam.openai.api.embedding.EmbeddingRequest
+import com.aallam.openai.api.embedding.EmbeddingResponse
 import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
@@ -72,6 +74,13 @@ class OpenAiLLM(@Value("\${openai.api.key}") val apiKey: String) : LLMClient {
         completion.choices[0].message?.let { chatHistory.add(it) }
 
         return OpenAIChatResponse(completion.id, completion.choices, requestMessage, prompts);
+    }
+
+    override suspend fun getEmbeddings(content: List<String>): EmbeddingResponse {
+        return openAI.embeddings(EmbeddingRequest(
+                model = ModelId("text-similarity-babbage-001"),
+                input = content
+        ));
     }
 
     override fun getHistory(): Map<LLMRequest, LLMResponse> = history;
