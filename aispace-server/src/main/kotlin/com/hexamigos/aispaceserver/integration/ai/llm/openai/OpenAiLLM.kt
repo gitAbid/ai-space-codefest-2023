@@ -26,6 +26,7 @@ class OpenAiLLM(@Value("\${openai.api.key}") val apiKey: String) : LLMClient {
     private val openAI = OpenAI(
             token = apiKey,
             timeout = Timeout(socket = 60.seconds),
+
             // additional configurations...
     )
 
@@ -52,13 +53,14 @@ class OpenAiLLM(@Value("\${openai.api.key}") val apiKey: String) : LLMClient {
 
     @OptIn(BetaOpenAI::class)
     override suspend fun getChatCompletion(request: LLMRequest): LLMResponse {
-        val (requestMessage, prompts) = request as OpenAIRequest
+        val (requestMessage, prompts, temperature) = request as OpenAIRequest
         chatHistory.add(ChatMessage(
                 role = ChatRole.User,
                 content = requestMessage
         ))
         val chatCompletionRequest = ChatCompletionRequest(
                 model = ModelId("gpt-3.5-turbo"),
+                temperature = temperature,
                 messages = arrayListOf(
                         ChatMessage(
                                 role = ChatRole.System,
