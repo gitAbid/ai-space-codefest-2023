@@ -7,14 +7,15 @@ import javax.annotation.PostConstruct
 
 @Component
 class EmailActionDetector : ActionDetector {
-    val tags = HashSet<String>()
-    override fun detect(input: String): ActionType {
-        TODO("Not yet implemented")
+    val tags = HashMap<String, Boolean>()
+    override fun detect(tokens: HashSet<String>): ActionType {
+        val isAction = tokens.any { key -> tags.getOrDefault(key, false) }
+        return if (isAction) ActionType.SEND_EMAIL else ActionType.NOT_DETECTED
     }
 
     @PostConstruct
     private fun build() {
-        tags.add("@send")
+        tags.put("@send", true)
     }
 
     override fun toString(): String {

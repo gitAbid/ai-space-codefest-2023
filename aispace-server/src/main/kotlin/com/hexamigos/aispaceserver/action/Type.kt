@@ -1,5 +1,5 @@
 package com.hexamigos.aispaceserver.action
 
 enum class ActionType {
-    SEND_EMAIL
+    SEND_EMAIL, NOT_DETECTED
 }

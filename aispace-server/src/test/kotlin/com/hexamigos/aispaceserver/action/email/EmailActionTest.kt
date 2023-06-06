@@ -7,24 +7,18 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class EmailActionTest {
-    companion object {
-        var apiKey: String = "API_KEY"
-        lateinit var llmClient: LLMClient
-        lateinit var emailAction: EmailAction
 
-        @JvmStatic
-        @BeforeAll
-        fun before() {
-            llmClient = OpenAiLLM(apiKey)
-            emailAction = EmailAction(llmClient)
-            emailAction.init()
-        }
-    }
+    @Autowired
+    lateinit var emailAction: EmailAction
+
+    @Autowired
+    lateinit var llmClient: LLMClient
 
     @Test
     fun getPrompt() {

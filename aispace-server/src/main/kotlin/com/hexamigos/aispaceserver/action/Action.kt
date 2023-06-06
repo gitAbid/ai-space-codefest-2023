@@ -9,4 +9,5 @@ interface Action<T> {
     fun process(input: String, llmClient: LLMClient): String
     fun transform(input: String): T
     fun execute(input: T): ActionStatus
+    fun executeChainAction(input: String): ActionStatus
 }

@@ -78,6 +78,35 @@ class OpenAiLLM(@Value("\${openai.api.key}") val apiKey: String) : LLMClient {
         return OpenAIChatResponse(completion.id, completion.choices, requestMessage, prompts);
     }
 
+    @OptIn(BetaOpenAI::class)
+    override suspend fun getChatCompletion(request: LLMRequest, chatHistory: ArrayList<ChatMessage>, updateHistory: Boolean): LLMResponse {
+        val (requestMessage, prompts, temperature) = request as OpenAIRequest
+        chatHistory.add(ChatMessage(
+                role = ChatRole.User,
+                content = requestMessage
+        ))
+        val chatCompletionRequest = ChatCompletionRequest(
+                model = ModelId("gpt-3.5-turbo"),
+                temperature = temperature,
+                messages = arrayListOf(
+                        ChatMessage(
+                                role = ChatRole.System,
+                                content = prompts
+                        ),
+
+                        ).apply {
+                    addAll(chatHistory)
+                }
+        )
+        val completion: ChatCompletion = openAI.chatCompletion(chatCompletionRequest)
+
+        if (updateHistory) {
+            completion.choices[0].message?.let { chatHistory.add(it) }
+        }
+
+        return OpenAIChatResponse(completion.id, completion.choices, requestMessage, prompts);
+    }
+
     override suspend fun getEmbeddings(content: List<String>): EmbeddingResponse {
         return openAI.embeddings(EmbeddingRequest(
                 model = ModelId("text-similarity-babbage-001"),
@@ -86,6 +115,8 @@ class OpenAiLLM(@Value("\${openai.api.key}") val apiKey: String) : LLMClient {
     }
 
     override fun getHistory(): Map<LLMRequest, LLMResponse> = history;
+    @BetaOpenAI
+    override fun getChatHistory() = chatHistory
 
 
 }
