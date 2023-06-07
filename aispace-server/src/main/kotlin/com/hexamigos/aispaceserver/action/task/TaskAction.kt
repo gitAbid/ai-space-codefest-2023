@@ -71,8 +71,4 @@ class TaskAction(val resourceCenter: ResourceCenter,
         TODO("Not yet implemented")
     }
 
-    override fun executeChainAction(input: String): ActionChain<Any> {
-        TODO("Not yet implemented")
-    }
-
 }
