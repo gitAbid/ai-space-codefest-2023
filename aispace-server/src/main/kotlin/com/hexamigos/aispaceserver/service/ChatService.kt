@@ -23,7 +23,7 @@ class ChatService(val openAiLLM: OpenAiLLM,
 
         }
 
-        val task = arrayListOf<String>("1. Task: Complete Release. Progress: Done",
+        val task = arrayListOf("1. Task: Complete Release. Progress: Done",
                 "2. Task: Discuss with weleed vai. Progress: Done",
                 "3. Task: Progress meeting on code fest. Progress: Done ",
                 "5. Task: Work on code fest demo. Progress: Ongoing")

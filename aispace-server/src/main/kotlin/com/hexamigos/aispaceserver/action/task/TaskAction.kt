@@ -43,6 +43,18 @@ class TaskAction(val resourceCenter: ResourceCenter,
         """.trimIndent().trim()
     }
 
+    override fun process(input: String): ActionChain<Processed<String, String>> {
+        val chain = super.process(input)
+        if (chain.hasNext()) {
+            val response = chain.content
+            if (response.processed.isEmpty()) {
+                val processed = Processed(response.original, response.original)
+                return ActionChain(ChainState.ABORT, processed)
+            }
+            return chain
+        }
+        return chain
+    }
     override fun recompilePrompt() {
         val taskManager = resourceCenter.getResourceByType(ResourceManagerType.TASK)
         val allTasks = taskManager.getAll()

@@ -79,12 +79,8 @@ class OpenAiLLM(@Value("\${openai.api.key}") val apiKey: String) : LLMClient {
     }
 
     @OptIn(BetaOpenAI::class)
-    override suspend fun getChatCompletion(request: LLMRequest, chatHistory: ArrayList<ChatMessage>, updateHistory: Boolean): LLMResponse {
+    override suspend fun getChatCompletionForAction(request: LLMRequest, chatHistory: ArrayList<ChatMessage>, updateHistory: Boolean): LLMResponse {
         val (requestMessage, prompts, temperature) = request as OpenAIRequest
-        chatHistory.add(ChatMessage(
-                role = ChatRole.User,
-                content = requestMessage
-        ))
         val chatCompletionRequest = ChatCompletionRequest(
                 model = ModelId("gpt-3.5-turbo"),
                 temperature = temperature,
@@ -92,10 +88,13 @@ class OpenAiLLM(@Value("\${openai.api.key}") val apiKey: String) : LLMClient {
                         ChatMessage(
                                 role = ChatRole.System,
                                 content = prompts
-                        ),
-
-                        ).apply {
+                        )
+                ).apply {
                     addAll(chatHistory)
+                    add(ChatMessage(
+                            role = ChatRole.User,
+                            content = requestMessage
+                    ))
                 }
         )
         val completion: ChatCompletion = openAI.chatCompletion(chatCompletionRequest)
@@ -115,6 +114,7 @@ class OpenAiLLM(@Value("\${openai.api.key}") val apiKey: String) : LLMClient {
     }
 
     override fun getHistory(): Map<LLMRequest, LLMResponse> = history;
+
     @BetaOpenAI
     override fun getChatHistory() = chatHistory
 

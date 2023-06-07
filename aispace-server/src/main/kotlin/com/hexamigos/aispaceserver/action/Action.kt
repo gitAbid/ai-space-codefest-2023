@@ -6,11 +6,13 @@ import com.hexamigos.aispaceserver.integration.ai.llm.LLMClient
 import com.hexamigos.aispaceserver.integration.ai.llm.OpenAIChatResponse
 import com.hexamigos.aispaceserver.integration.ai.llm.OpenAIRequest
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
 abstract class Action<T>(var prompt: String = "",
                          val llmClient: LLMClient) {
+    private val logger = LoggerFactory.getLogger(Action::class.java)
     abstract fun init();
     fun recompilePrompt() {
     }
@@ -24,7 +26,7 @@ abstract class Action<T>(var prompt: String = "",
         var chain: ActionChain<Processed<String, String>>
         runBlocking {
             try {
-                val chatCompletion = llmClient.getChatCompletion(
+                val chatCompletion = llmClient.getChatCompletionForAction(
                         OpenAIRequest(
                                 requestMessage = processedInput,
                                 prompts = prompt
@@ -52,5 +54,23 @@ abstract class Action<T>(var prompt: String = "",
 
     abstract fun transform(chain: ActionChain<Processed<String, String>>): ActionChain<Transformed<Any, Email>>
     abstract fun execute(chain: ActionChain<Transformed<Any, Email>>): ActionChain<ActionStatus>
-    abstract fun executeChainAction(input: String): ActionChain<Any>
+    fun executeChainAction(input: String): ActionChain<Any> {
+        logger.info("Executing email sending action chain")
+        val processed = process(input)
+
+        return if (processed.hasNext()) {
+            logger.info("Processed input to desired output: [$processed]")
+            val transformed = transform(processed)
+            if (transformed.hasNext()) {
+                logger.info("Transformed processed output to object : [$transformed]")
+                logger.info("Executed transformed object to action: [status: $transformed]")
+                val (next, content) = execute(transformed)
+                ActionChain(next, content.message);
+            } else {
+                ActionChain(transformed.state, transformed.content);
+            }
+        } else {
+            ActionChain(processed.state, processed.content);
+        }
+    }
 }

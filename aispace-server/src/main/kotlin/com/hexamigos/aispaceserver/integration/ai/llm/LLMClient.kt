@@ -11,7 +11,7 @@ interface LLMClient {
     fun getHistory(): Map<LLMRequest, LLMResponse>
 
     @OptIn(BetaOpenAI::class)
-    suspend fun getChatCompletion(request: LLMRequest, chatHistory: ArrayList<ChatMessage>, updateHistory: Boolean = false): LLMResponse
+    suspend fun getChatCompletionForAction(request: LLMRequest, chatHistory: ArrayList<ChatMessage>, updateHistory: Boolean = false): LLMResponse
     @OptIn(BetaOpenAI::class)
     fun getChatHistory(): ArrayList<ChatMessage>
 }

@@ -56,27 +56,6 @@ class EmailAction(llmClient: LLMClient,
         return ActionChain(ChainState.NEXT, transformed)
     }
 
-    override fun executeChainAction(input: String): ActionChain<Any> {
-        logger.info("Executing email sending action chain")
-        val processed = process(input)
-
-        return if (processed.hasNext()) {
-            logger.info("Processed input to desired output: [$processed]")
-            val transformed = transform(processed)
-            if (transformed.hasNext()) {
-                logger.info("Transformed processed output to object : [$transformed]")
-                logger.info("Executed transformed object to action: [status: $transformed]")
-                val (next, content) = execute(transformed)
-                ActionChain(next, content.message);
-            } else {
-                ActionChain(transformed.state, transformed.content);
-            }
-        } else {
-            ActionChain(processed.state, processed.content);
-        }
-
-    }
-
     override fun execute(chain: ActionChain<Transformed<Any, Email>>): ActionChain<ActionStatus> {
         emailService.send(chain.content.processed)
         return ActionChain(ChainState.FINISHED, ActionStatus.APPROVAL_NEEDED)
