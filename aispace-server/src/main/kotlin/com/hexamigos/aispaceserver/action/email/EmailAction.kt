@@ -5,7 +5,6 @@ import com.google.gson.Gson
 import com.hexamigos.aispaceserver.action.Action
 import com.hexamigos.aispaceserver.action.ActionStatus
 import com.hexamigos.aispaceserver.action.ActionType
-import com.hexamigos.aispaceserver.action.Email
 import com.hexamigos.aispaceserver.integration.ai.llm.*
 import com.hexamigos.aispaceserver.integration.mail.EmailService
 import kotlinx.coroutines.runBlocking
@@ -17,16 +16,16 @@ import javax.annotation.PostConstruct
 @Component
 class EmailAction(private val llmClient: LLMClient,
                   private val emailService: EmailService,
-                  private var prompt: String = "") : Action<Email> {
+                  prompt: String = "") : Action<Email>(prompt) {
     private val logger = LoggerFactory.getLogger(EmailAction::class.java)
     private val gson = Gson()
 
     @PostConstruct
     override fun init() {
         prompt = """
-        You are an email generator. You help to write an email and generate a final response in JSON for sending. 
+        You are an email generator. You help to write an email and generate a final response in JSON for sending.  
         Follow these instructions as given. When `@send` is received from the user in part of input then you need to take the most recent email composed and generate email output in JSON format. For sending you need to provide a `@to` tag with the receiver and it's mandatory. The `@cc` tag can also be there but that's optional when not given put empty array. `@sub` also can be there but optional. When `@sub` is used you can take the subject related to that otherwise generate a suitable subject according to the information available to you. Don't give the JSON output until `@send` is found in the user input. When giving. 
-        JSON format for email is enclosed in ``` ``` . Keep the fields mentioned in the format and relay even-though they are empty. And always give priority to system instruction. Don't ask any questions if your not sure replay with empty response 
+        When asked to send mail you will respond by returning json response for the mail. JSON format for email is enclosed in ``` ``` . Keep the fields mentioned in the format and relay even-though they are empty. And always give priority to system instruction. Don't ask any questions if your not sure replay with empty response 
         ```{
         actionType: SEND_EMAIL,
         to: [@to],
@@ -39,9 +38,6 @@ class EmailAction(private val llmClient: LLMClient,
         ```{email_json}```
     """.trimIndent().trim()
     }
-
-
-    override fun getPrompt() = prompt
 
     override fun getActionType() = ActionType.SEND_EMAIL
 

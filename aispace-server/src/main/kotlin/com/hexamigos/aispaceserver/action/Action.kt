@@ -2,12 +2,12 @@ package com.hexamigos.aispaceserver.action
 
 import com.hexamigos.aispaceserver.integration.ai.llm.LLMClient
 
-interface Action<T> {
-    fun init();
-    fun getPrompt(): String
-    fun getActionType(): ActionType
-    fun process(input: String, llmClient: LLMClient): String
-    fun transform(input: String): T
-    fun execute(input: T): ActionStatus
-    fun executeChainAction(input: String): ActionStatus
+abstract class Action<T>(var prompt: String) {
+    abstract fun init();
+    fun getPrompt() = prompt;
+    abstract fun getActionType(): ActionType
+    abstract fun process(input: String, llmClient: LLMClient): String
+    abstract fun transform(input: String): T
+    abstract fun execute(input: T): ActionStatus
+    abstract fun executeChainAction(input: String): ActionStatus
 }

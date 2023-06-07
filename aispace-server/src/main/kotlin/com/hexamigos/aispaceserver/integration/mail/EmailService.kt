@@ -1,6 +1,6 @@
 package com.hexamigos.aispaceserver.integration.mail
 
-import com.hexamigos.aispaceserver.action.Email
+import com.hexamigos.aispaceserver.action.email.Email
 import com.hexamigos.aispaceserver.integration.mail.client.EmailClient
 import org.springframework.stereotype.Component
 
