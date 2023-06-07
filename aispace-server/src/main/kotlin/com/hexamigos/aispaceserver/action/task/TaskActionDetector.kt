@@ -1,4 +1,4 @@
-package com.hexamigos.aispaceserver.action.email
+package com.hexamigos.aispaceserver.action.task
 
 import com.hexamigos.aispaceserver.action.ActionDetector
 import com.hexamigos.aispaceserver.action.ActionType
@@ -6,13 +6,13 @@ import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 
 @Component
-class EmailActionDetector : ActionDetector(ActionType.SEND_EMAIL) {
+class TaskActionDetector : ActionDetector(ActionType.TASK) {
     @PostConstruct
     private fun build() {
-        tags["@send"] = true
+        tags["@task"] = true
     }
 
     override fun toString(): String {
-        return "EmailActionDetector"
+        return "TaskActionDetector"
     }
 }

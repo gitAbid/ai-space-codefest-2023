@@ -36,12 +36,12 @@ class ActionManager(private val context: ApplicationContext,
         return actionTypes
     }
 
-    fun performAction(input: String, actionType: ActionType): ActionStatus {
+    fun performAction(input: String, actionType: ActionType): ActionChain<Any> {
         logger.info("Performing actions [type: $actionType, input: $input]")
         return actions[actionType]?.run {
-            val actionStatus = executeChainAction(input)
-            logger.info("Finished performing actions [type: $actionType, input: $input, status: $actionStatus]")
-            actionStatus
+            val actionChain = executeChainAction(input)
+            logger.info("Finished performing actions [type: $actionType, input: $input, status: $actionChain]")
+            actionChain
         } ?: throw RuntimeException("Invalid action to perform [$actionType]")
     }
 

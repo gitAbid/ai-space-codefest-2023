@@ -11,7 +11,8 @@ class ActionCenter(val actionManager: ActionManager) {
         logger.info("Detecting and Executing actions")
         return actionManager.detectAction(input)
                 .map { action -> actionManager.performAction(input, action) }
-                .map { actionStatus -> actionStatus.message }
+                .map { actionStatus -> actionStatus.content }
+                .map { content -> if (content is ActionResponse<*, *>) content.processed.toString() else content.toString() }
                 .toList();
     }
 }

@@ -1,22 +1,18 @@
 package com.hexamigos.aispaceserver.action.email
 
-import com.aallam.openai.api.BetaOpenAI
 import com.google.gson.Gson
-import com.hexamigos.aispaceserver.action.Action
-import com.hexamigos.aispaceserver.action.ActionStatus
-import com.hexamigos.aispaceserver.action.ActionType
+import com.hexamigos.aispaceserver.action.*
 import com.hexamigos.aispaceserver.integration.ai.llm.*
 import com.hexamigos.aispaceserver.integration.mail.EmailService
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 
 
 @Component
-class EmailAction(private val llmClient: LLMClient,
+class EmailAction(llmClient: LLMClient,
                   private val emailService: EmailService,
-                  prompt: String = "") : Action<Email>(prompt) {
+                  prompt: String = "") : Action<Email>(prompt, llmClient) {
     private val logger = LoggerFactory.getLogger(EmailAction::class.java)
     private val gson = Gson()
 
@@ -41,43 +37,49 @@ class EmailAction(private val llmClient: LLMClient,
 
     override fun getActionType() = ActionType.SEND_EMAIL
 
-    @OptIn(BetaOpenAI::class)
-    override fun process(input: String, llmClient: LLMClient): String {
-        val processedInput = input.trim().replace("\n", " ")
-        val chatHistory = llmClient.getChatHistory();
-        return runBlocking {
-            val chatCompletion = this@EmailAction.llmClient.getChatCompletion(
-                    OpenAIRequest(
-                            requestMessage = processedInput,
-                            prompts = prompt
-                    ),
-                    chatHistory,
-                    false
-            ) as OpenAIChatResponse
-
-            val content = chatCompletion.responseMessage.first().message?.content
-            content?.substringAfter("```")?.substringBefore("```") ?: ""
+    override fun process(input: String): ActionChain<Processed<String, String>> {
+        val chain = super.process(input)
+        if (chain.hasNext()) {
+            val response = chain.content
+            if (response.processed.isEmpty()) {
+                val processed = Processed(response.original, response.original)
+                return ActionChain(ChainState.ABORT, processed)
+            }
+            return chain;
         }
+        return chain;
     }
 
-    override fun transform(input: String): Email {
-        return gson.fromJson(input, Email::class.java)
+    override fun transform(chain: ActionChain<Processed<String, String>>): ActionChain<Transformed<Any, Email>> {
+        val content = gson.fromJson(chain.content.processed, Email::class.java)
+        val transformed = Transformed<Any, Email>(chain.content, content)
+        return ActionChain(ChainState.NEXT, transformed)
     }
 
-    override fun executeChainAction(input: String): ActionStatus {
+    override fun executeChainAction(input: String): ActionChain<Any> {
         logger.info("Executing email sending action chain")
-        val processed = process(input, llmClient)
-        logger.info("Processed input to desired output: [$processed]")
-        val transformed = transform(processed)
-        logger.info("Transformed processed output to object : [$transformed]")
-        val executed = execute(transformed)
-//        logger.info("Executed transformed object to action: [status: $transformed]")
-        return executed;
+        val processed = process(input)
+
+        return if (processed.hasNext()) {
+            logger.info("Processed input to desired output: [$processed]")
+            val transformed = transform(processed)
+            if (transformed.hasNext()) {
+                logger.info("Transformed processed output to object : [$transformed]")
+                logger.info("Executed transformed object to action: [status: $transformed]")
+                val (next, content) = execute(transformed)
+                ActionChain(next, content.message);
+            } else {
+                ActionChain(transformed.state, transformed.content);
+            }
+        } else {
+            ActionChain(processed.state, processed.content);
+        }
+
     }
 
-    override fun execute(email: Email): ActionStatus {
-        emailService.send(email)
-        return ActionStatus.APPROVAL_NEEDED
+    override fun execute(chain: ActionChain<Transformed<Any, Email>>): ActionChain<ActionStatus> {
+        emailService.send(chain.content.processed)
+        return ActionChain(ChainState.FINISHED, ActionStatus.APPROVAL_NEEDED)
     }
 
     override fun toString(): String {
